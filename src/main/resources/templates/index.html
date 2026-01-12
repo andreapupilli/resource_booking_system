@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="it" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resource Booking</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 0; }
+        header { padding: 16px; border-bottom: 1px solid #ddd; }
+        main { padding: 16px; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+        .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
+        .row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 600px) { .row { grid-template-columns: 1fr 1fr; } }
+        label { font-size: 12px; color: #444; display: block; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px; }
+        textarea { min-height: 90px; }
+        button { padding: 10px 14px; border: 1px solid #333; border-radius: 10px; background: #111; color: #fff; cursor: pointer; }
+        button.secondary { background: #fff; color: #111; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px 6px; text-align: left; font-size: 14px; }
+        .muted { color: #666; font-size: 12px; }
+        .actions { display: flex; gap: 8px; align-items: center; }
+        .pill { display: inline-block; padding: 2px 8px; border: 1px solid #ddd; border-radius: 999px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 style="margin:0; font-size: 20px;">Resource Booking</h1>
+    <div class="muted">Demo UI minimale (Thymeleaf) + API REST su <span class="pill">/api/*</span></div>
+</header>
+
+<main>
+    <div class="grid">
+        <section class="card">
+            <h2 style="margin-top:0;">Crea risorsa</h2>
+            <form method="post" th:action="@{/ui/resources}" th:object="${newResource}">
+                <div class="row">
+                    <div>
+                        <label>Nome</label>
+                        <input th:field="*{name}" placeholder="Es. Aula 3, Proiettore, Sala riunioni" required />
+                    </div>
+                    <div>
+                        <label>Tipo</label>
+                        <select th:field="*{type}" required>
+                            <option th:each="t : ${resourceTypes}" th:value="${t}" th:text="${t}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Location</label>
+                        <input th:field="*{location}" placeholder="Es. Edificio A, Piano 2" required />
+                    </div>
+                    <div>
+                        <label>Attiva</label>
+                        <select th:field="*{active}">
+                            <option th:value="true">Sì</option>
+                            <option th:value="false">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <label>Descrizione (opzionale)</label>
+                    <textarea th:field="*{description}" placeholder="Dettagli utili..."></textarea>
+                </div>
+                <div style="margin-top:12px;">
+                    <button type="submit">Crea risorsa</button>
+                </div>
+            </form>
+        </section>
+
+        <section>
+            <h2>Crea utente</h2>
+            <form th:action="@{/ui/users}" th:object="${newUser}" method="post">
+                <input type="text" th:field="*{username}" placeholder="username" required />
+                <button type="submit">Crea</button>
+            </form>
+        </section>
+
+        <div th:if="${uiError}" style="margin-top: 10px; color: #b00020;">
+            <p th:text="${uiError}"></p>
+        </div>
+
+        <div th:if="${uiInfo}" style="margin-top: 10px; color: #006400;">
+            <p th:text="${uiInfo}"></p>
+        </div>
+
+
+        <section class="card">
+            <h2 style="margin-top:0;">Crea prenotazione</h2>
+            <p class="muted" style="margin-top:-6px;">Se non hai utenti, creali via API: <span class="pill">POST /api/users</span></p>
+            <form method="post" th:action="@{/ui/bookings}" th:object="${newBooking}">
+                <div class="row">
+                    <div>
+                        <label>Risorsa</label>
+                        <select th:field="*{resourceId}" required>
+                            <option value="" disabled selected>Seleziona...</option>
+                            <option th:each="r : ${resources}" th:value="${r.id}" th:text="${r.name + ' (' + r.type + ') - ' + r.location}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Utente</label>
+                        <select th:field="*{userId}" required>
+                            <option value="" disabled selected>Seleziona...</option>
+                            <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.username}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Inizio</label>
+                        <input type="datetime-local" th:field="*{startAt}" required />
+                    </div>
+                    <div>
+                        <label>Fine</label>
+                        <input type="datetime-local" th:field="*{endAt}" required />
+                    </div>
+                </div>
+                <div style="margin-top:12px;">
+                    <button type="submit">Prenota</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+        <h2 style="margin-top:0;">Risorse</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th><th>Nome</th><th>Tipo</th><th>Location</th><th>Attiva</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${resources}">
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.name}"></td>
+                <td th:text="${r.type}"></td>
+                <td th:text="${r.location}"></td>
+                <td th:text="${r.active}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+        <h2 style="margin-top:0;">Prenotazioni</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th><th>ResourceId</th><th>UserId</th><th>Start</th><th>End</th><th>Status</th><th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${bookings}">
+                <td th:text="${b.id}"></td>
+                <td th:text="${b.resourceId}"></td>
+                <td th:text="${b.userId}"></td>
+                <td th:text="${b.startAt}"></td>
+                <td th:text="${b.endAt}"></td>
+                <td th:text="${b.status}"></td>
+                <td>
+                    <div class="actions">
+                        <form th:if="${b.status.name() == 'CONFIRMED'}" method="post" th:action="@{/ui/bookings/{id}/cancel(id=${b.id})}">
+                            <button type="submit" class="secondary">Annulla</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+        <h2 style="margin-top:0;">API rapide</h2>
+        <div class="muted">
+            <div><span class="pill">GET /api/resources</span> <span class="pill">POST /api/resources</span></div>
+            <div><span class="pill">GET /api/users</span> <span class="pill">POST /api/users</span></div>
+            <div><span class="pill">GET /api/bookings</span> <span class="pill">POST /api/bookings</span> <span class="pill">PUT /api/bookings/{id}/cancel</span></div>
+            <div><span class="pill">GET /api/resources/{id}/availability</span></div>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
