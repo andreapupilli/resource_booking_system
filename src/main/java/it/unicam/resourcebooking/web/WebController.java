@@ -52,6 +52,7 @@ public class WebController {
     public String createResource(@ModelAttribute("newResource") Resource resource,
                                  RedirectAttributes redirectAttributes) {
         try {
+            resource.setActive(true);
             resourceService.create(resource);
             redirectAttributes.addFlashAttribute("uiInfo", "Risorsa creata correttamente.");
         } catch (Exception ex) {
@@ -59,6 +60,7 @@ public class WebController {
         }
         return "redirect:/";
     }
+
 
     @PostMapping("/ui/bookings")
     public String createBooking(@ModelAttribute("newBooking") BookingForm form,

@@ -41,6 +41,9 @@ public class BookingService {
 
         Resource resource = resourceRepository.findById(request.resourceId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Resource not found: " + request.resourceId()));
+        if (!resource.isActive()) {
+            throw new ApiException(HttpStatus.CONFLICT, "Risorsa non attiva: non prenotabile");
+        }
 
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found: " + request.userId()));
@@ -77,12 +80,17 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public boolean isAvailable(Long resourceId, java.time.OffsetDateTime startAt, java.time.OffsetDateTime endAt) {
-        if (!resourceRepository.existsById(resourceId)) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "Resource not found: " + resourceId);
+        Resource resource = resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Resource not found: " + resourceId));
+
+        if (!resource.isActive()) {
+            return false;
         }
+
         if (!endAt.isAfter(startAt)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "endAt deve essere successivo a startAt");
         }
+
         return bookingRepository.findConflictingBookings(resourceId, startAt, endAt, BookingStatus.CONFIRMED).isEmpty();
     }
 
