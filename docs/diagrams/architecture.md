@@ -1,6 +1,7 @@
 ```mermaid
 flowchart LR
-  U[Browser] -->|HTTP| A[Spring Boot]
-  A -->|HTML views| T[Thymeleaf]
-  A -->|JPA| R[(PostgreSQL)]
+  U[User / Browser] -->|HTTP| C[Spring Boot Controllers]
+  C --> S[Services]
+  S -->|JPA / Hibernate| R[(PostgreSQL)]
+  C -->|Model| T[Thymeleaf Templates]
 
