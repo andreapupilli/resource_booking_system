@@ -134,6 +134,9 @@
 
         .mt-12 { margin-top: 12px; }
 
+        .alert.warning { border-color: rgba(245,158,11,.35); color: #92400e; background: #fffbeb; }
+
+
 
     </style>
 
@@ -146,6 +149,9 @@
 </header>
 
 <main>
+    <div th:if="${uiError}" class="alert error" role="alert" th:text="${uiError}"></div>
+    <div th:if="${uiWarning}" class="alert warning" role="alert" th:text="${uiWarning}"></div>
+    <div th:if="${uiInfo}" class="alert success" role="alert" th:text="${uiInfo}"></div>
     <div class="grid">
         <section class="card">
             <h2 style="margin-top:0;">Crea risorsa</h2>
