@@ -42,7 +42,7 @@ public class BookingService {
         Resource resource = resourceRepository.findById(request.resourceId())
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Resource not found: " + request.resourceId()));
         if (!resource.isActive()) {
-            throw new ApiException(HttpStatus.CONFLICT, "Risorsa non attiva: non prenotabile");
+            throw new ApiException(HttpStatus.CONFLICT, "RESOURCE_INACTIVE");
         }
 
         User user = userRepository.findById(request.userId())
@@ -56,7 +56,7 @@ public class BookingService {
         );
 
         if (!conflicts.isEmpty()) {
-            throw new ApiException(HttpStatus.CONFLICT, "Resource already booked in this time range");
+            throw new ApiException(HttpStatus.CONFLICT, "RESOURCE_UNAVAILABLE");
         }
 
         Booking booking = new Booking();

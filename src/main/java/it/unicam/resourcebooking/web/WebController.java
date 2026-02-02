@@ -83,13 +83,54 @@ public class WebController {
             OffsetDateTime startAt = form.getStartAt().atZone(zone).toOffsetDateTime();
             OffsetDateTime endAt = form.getEndAt().atZone(zone).toOffsetDateTime();
 
-            bookingService.create(new CreateBookingRequest(form.getResourceId(), form.getUserId(), startAt, endAt));
+            bookingService.create(
+                    new CreateBookingRequest(
+                            form.getResourceId(),
+                            form.getUserId(),
+                            startAt,
+                            endAt
+                    )
+            );
+
             redirectAttributes.addFlashAttribute("uiInfo", "Prenotazione creata correttamente.");
-        } catch (Exception ex) {
-            redirectAttributes.addFlashAttribute("uiError", "Errore creazione prenotazione: " + safeMessage(ex));
         }
+        catch (it.unicam.resourcebooking.exception.ApiException ex) {
+
+            if (ex.getStatus() == org.springframework.http.HttpStatus.CONFLICT) {
+
+                switch (ex.getMessage()) {
+                    case "RESOURCE_UNAVAILABLE" -> redirectAttributes.addFlashAttribute(
+                            "uiWarning",
+                            "Prenotazione NON effettuata: la risorsa è già prenotata nell'intervallo selezionato."
+                    );
+
+                    case "RESOURCE_INACTIVE" -> redirectAttributes.addFlashAttribute(
+                            "uiWarning",
+                            "Prenotazione NON effettuata: la risorsa non è attiva e non può essere prenotata."
+                    );
+
+                    default -> redirectAttributes.addFlashAttribute(
+                            "uiWarning",
+                            "Prenotazione NON effettuata: conflitto sulla risorsa."
+                    );
+                }
+            } else {
+                redirectAttributes.addFlashAttribute(
+                        "uiError",
+                        "Errore creazione prenotazione: " + safeMessage(ex)
+                );
+            }
+        }
+        catch (Exception ex) {
+            redirectAttributes.addFlashAttribute(
+                    "uiError",
+                    "Errore creazione prenotazione: " + safeMessage(ex)
+            );
+        }
+
         return "redirect:/";
     }
+
 
     @PostMapping("/ui/bookings/{id}/cancel")
     public String cancelBooking(@PathVariable Long id,
