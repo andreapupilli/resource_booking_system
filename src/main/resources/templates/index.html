@@ -149,9 +149,21 @@
 </header>
 
 <main>
-    <div th:if="${uiError}" class="alert error" role="alert" th:text="${uiError}"></div>
-    <div th:if="${uiWarning}" class="alert warning" role="alert" th:text="${uiWarning}"></div>
-    <div th:if="${uiInfo}" class="alert success" role="alert" th:text="${uiInfo}"></div>
+    <div th:if="${uiError != null and !#strings.isEmpty(uiError)}"
+         class="alert error" role="alert"
+         th:text="${uiError}">
+    </div>
+
+    <div th:if="${uiWarning != null and !#strings.isEmpty(uiWarning)}"
+         class="alert warning" role="alert"
+         th:text="${uiWarning}">
+    </div>
+
+    <div th:if="${uiInfo != null and !#strings.isEmpty(uiInfo)}"
+         class="alert success" role="alert"
+         th:text="${uiInfo}">
+    </div>
+
     <div class="grid">
         <section class="card">
             <h2 style="margin-top:0;">Crea risorsa</h2>

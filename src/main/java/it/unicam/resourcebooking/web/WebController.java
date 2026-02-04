@@ -31,7 +31,8 @@ public class WebController {
     @GetMapping("/")
     public String home(Model model,
                        @ModelAttribute("uiError") String uiError,
-                       @ModelAttribute("uiInfo") String uiInfo) {
+                       @ModelAttribute("uiInfo") String uiInfo,
+                       @ModelAttribute("uiWarning") String uiWarning){
 
         model.addAttribute("resources", resourceService.list());
         model.addAttribute("users", userService.list());
