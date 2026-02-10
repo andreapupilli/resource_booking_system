@@ -1,109 +1,76 @@
-# Resource Booking System
+# Resource Booking System — Module 1
 
-Web application for managing and booking shared resources
-(e.g. rooms, desks, laboratories).
+## Panoramica del progetto
+Il progetto **Resource Booking System** è una web application sviluppata in Java che consente la **gestione e la prenotazione di risorse condivise** (ad esempio aule, sale riunioni, laboratori o attrezzature) da parte di utenti registrati.
 
-The project was developed incrementally across two exam modules.
-This repository contains the extended version required for **Module 2**,
-including Docker, CI/CD and cloud deployment.
+L’obiettivo del progetto è realizzare un sistema semplice ma strutturato che permetta di:
+- creare e gestire risorse;
+- creare e gestire utenti;
+- effettuare prenotazioni su intervalli temporali definiti;
+- prevenire conflitti di prenotazione;
+- offrire sia un’interfaccia web sia un accesso tramite API REST.
 
----
-
-## Architecture Overview
-
-### Application Architecture
-```mermaid
-flowchart LR
-  U[Browser] -->|HTTP| A[Spring Boot]
-  A -->|HTML views| T[Thymeleaf]
-  A -->|JPA| R[(PostgreSQL)]
-```
-
-### CI/CD and Deployment Architecture
-```mermaid
-flowchart LR
-  DEV[Developer] -->|push| GH[GitHub Repository]
-  GH -->|CI build and test| CI[GitHub Actions]
-  GH -->|deploy from branch module2| RWS[Render Web Service]
-  USER[User Browser] -->|HTTPS| RWS
-  RWS -->|connect| RDB[(Render PostgreSQL)]
-```
+Il progetto rappresenta la **versione richiesta per il Modulo 1**, focalizzata sulla modellazione del dominio, sulla logica applicativa e sulla persistenza dei dati.
 
 ---
 
-## Technologies
+## Funzionalità principali
+
+### Gestione delle risorse
+- Creazione di risorse con nome, tipo, location e descrizione opzionale.
+- Gestione dello stato della risorsa (attiva / non attiva).
+- Visualizzazione dell’elenco delle risorse disponibili.
+
+### Gestione degli utenti
+- Creazione di utenti identificati da username.
+- Visualizzazione dell’elenco degli utenti registrati.
+
+### Gestione delle prenotazioni
+- Creazione di prenotazioni indicando risorsa, utente, data/ora di inizio e fine.
+- Validazioni:
+  - la data di fine deve essere successiva alla data di inizio;
+  - la risorsa deve essere attiva;
+  - una risorsa non può essere prenotata se già occupata nello stesso intervallo.
+- Visualizzazione e annullamento delle prenotazioni.
+
+---
+
+## Interfaccia web e API REST
+
+Il sistema offre due modalità di utilizzo.
+
+**Interfaccia Web (UI server-side)**  
+È disponibile una UI minimale basata su Thymeleaf che permette la gestione completa di risorse, utenti e prenotazioni tramite form e tabelle.
+
+**API REST**  
+Sono disponibili API REST sotto il prefisso `/api/*` per la gestione programmatica delle risorse, degli utenti e delle prenotazioni, utilizzando metodi HTTP standard e codici di stato significativi (ad esempio 409 in caso di conflitto).
+
+---
+
+## Architettura dell’applicazione
+L’architettura del progetto è organizzata a strati:
+- Presentation layer: controller Spring MVC e REST
+- Service layer: logica di business e regole di prenotazione
+- Persistence layer: JPA/Hibernate e repository
+
+---
+
+## Tecnologie utilizzate
 - Java 21
 - Spring Boot
+- Spring MVC
 - Thymeleaf
+- Spring Data JPA / Hibernate
 - PostgreSQL
-- Docker & Docker Compose
-- GitHub Actions (CI)
-- Render (Cloud Deployment)
+- Gradle
 
 ---
 
-## Run Locally (Docker)
-
-See detailed instructions:
-- `docs/guide/local-run.md`
-
-Quick start:
-```bash
-git clone https://github.com/andreapupilli/resource_booking_system.git
-cd resource_booking_system
-git checkout module2
-docker compose up --build
-```
-
-Open:
-- http://localhost:8080
+## Avvio dell’applicazione
+Dopo aver configurato un database PostgreSQL locale, l’applicazione può essere avviata eseguendo Gradle e sarà accessibile all’indirizzo http://localhost:8080.
 
 ---
 
-## CI/CD Pipeline
-
-The project uses GitHub Actions to automatically build and test the application.
-
-Details:
-- `docs/guide/ci-cd.md`
-
----
-
-## Cloud Deployment
-
-The application is deployed on **Render** as a Docker-based Web Service.
-
-- Live URL:  
-  https://resource-booking-system-jjvs.onrender.com
-
-Deployment details:
-- `docs/guide/deploy-render.md`
-
----
-
-## Database
-
-- Managed PostgreSQL instance on Render
-- Connection parameters are provided via environment variables
-
----
-
-## Repository Structure
-
-```
-.github/workflows/ci.yml   # CI pipeline
-docs/
-  diagrams/               # Architecture diagrams
-  guide/                  # Local run, CI/CD, deployment guides
-src/                       # Application source code
-docker-compose.yml
-Dockerfile
-```
-
----
-
-## Exam Notes
-
-- **Module 1** submission corresponds to tag: `module1-final`
-- **Module 2** is developed on branch: `module2`
-- The project is cloud-native, containerized, and fully reproducible from scratch
+## Riferimento Git
+La versione relativa al **Modulo 1** è identificata dal tag **module1-final**.  
+Questa versione rappresenta la consegna del Modulo 1, priva di estensioni cloud-native o containerizzazione.
