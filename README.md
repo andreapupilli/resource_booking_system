@@ -163,3 +163,4 @@ Tests are executed using the `test` profile and rely on an in-memory H2 database
 - **Module 1** submission corresponds to tag: `module1-final`
 - **Module 2** is developed on branch: `module2`
 - The project is cloud-native, containerized, and fully reproducible from scratch
+- Slide per la presentazione https://docs.google.com/presentation/d/14rc-ymD4dsOyaEZ8QL-7HodP9rw4dH7j6oWWo4JA_ws/edit?usp=sharing
